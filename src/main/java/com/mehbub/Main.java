@@ -3,6 +3,12 @@ package com.mehbub;
 import com.mehbub.lib.CommandLineParserUtil;
 import com.mehbub.lib.FileParser;
 
+/**
+ * Call from console : where the jar located. Change the file path
+ * pattern : java -jar jarname -f filename -s separator
+ * Copy the below and change appropriately
+ * java -jar pstparser-jar-with-dependencies.jar -f "E:\\trial\\pst.ag\\Java task\\DSV input 2.txt" -s "|"
+ */
 public class Main {
 
     public static void main(String[] args) {
@@ -11,8 +17,6 @@ public class Main {
         System.out.println(" You provided " + args.length + " arguments.\n");
 
         doFileProcess(args);
-
-        System.out.println("... File Parsing Done. ...");
     }
 
     private static void doFileProcess(String[] args) {

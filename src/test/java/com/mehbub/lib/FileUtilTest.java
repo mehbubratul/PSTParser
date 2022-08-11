@@ -82,31 +82,6 @@ class FileUtilTest {
         System.out.println(sb);
     }
 
-//    @Test
-//    void getFileFromTestResourceDirectory() {
-//        Path resourceDirectory = Paths.get("src", "test", "resources");
-//        String absolutePath = resourceDirectory.toFile().getAbsolutePath();
-//
-//        System.out.println(absolutePath);
-//
-//        assertTrue(absolutePath.endsWith("src/test/resources"));
-//    }
-//
-//    @Test
-//    public void testReadFileWithClassLoader(){
-//        ClassLoader classLoader = this.getClass().getClassLoader();
-//        File file = new File(classLoader.getResource("lorem_ipsum.txt").getFile());
-//        assertTrue(file.exists());
-//
-//    }
-//
-//    @Test
-//    public void testReadFileWithResource() {
-//        URL url = this.getClass().getResource("/lorem_ipsum.txt");
-//        File file = new File(url.getFile());
-//        assertTrue(file.exists());
-//    }
-
     @Test
     public void readFileRelativePath_DSV_Input_1() {
         File file = new File(dsvInputOneFilePath);

@@ -1,13 +1,9 @@
 package com.mehbub.lib;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.mehbub.lib.DSV;
-import com.mehbub.lib.DateUtil;
-import com.mehbub.lib.FileUtil;
 
 import java.io.FileInputStream;
 import java.io.FileWriter;
-import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.*;
 
@@ -39,10 +35,6 @@ public class FileParser {
 
         try (FileInputStream inputStream = new FileInputStream(inputFilePath)) {
 
-            // FileInputStream = 13 sec 17 ms
-            // BufferedInputStream = 13 sec 117 ms
-
-            // System.out.println("Remaining bytes that can be read : " + inputStream.available());
             DSV DSV = new DSV(false, separator, inputStream);
 
             //region headers
@@ -94,8 +86,12 @@ public class FileParser {
                 }
                 printWriter.println(mapper.writeValueAsString(obj));
             }
+
             printWriter.close();
             fileWriter.close();
+
+            System.out.println("... File parsed successfully. ...");
+            System.out.println("Please, check the jar location to get the produced file.");
             return new AbstractMap.SimpleEntry<>(true, "File parsed successfully.");
             //endregion
 

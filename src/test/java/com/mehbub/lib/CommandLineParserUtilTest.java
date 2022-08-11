@@ -9,7 +9,6 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class CommandLineParserUtilTest {
 
-    //  java -jar pstparser-jar-with-dependencies.jar -f "E:\\trial\\pst.ag\\Java task\\DSV input 2.txt" -s "|"
     final int numberOfArguments = 4;
 
     String[] nullOrEmptyArgs;

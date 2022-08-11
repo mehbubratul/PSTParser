@@ -17,17 +17,19 @@ public class FileUtil {
         Path path = Paths.get(inputFilePath);
 
         if (!Files.exists(path)) {
+            System.out.println("File doesn't exist");
             return new AbstractMap.SimpleEntry<>(false, "File doesn't exist");
         }
 
         if (Files.isDirectory(path)) {
+            System.out.println("File exists, but it is a directory.");
             return new AbstractMap.SimpleEntry<>(false, "File exists, but it is a directory.");
         }
 
         if (Files.isRegularFile(path)) {
             return new AbstractMap.SimpleEntry<>(true, "File exists!");
         }
-
+        System.out.println("Unable to validate file!");
         return new AbstractMap.SimpleEntry<>(false, "Unable to validate file!");
     }
 
@@ -40,9 +42,6 @@ public class FileUtil {
         sb.append(outFileName);
         sb.append(".JSONL");
 
-//        Path currentRelativePath = Paths.get("");
-//        String s = currentRelativePath.toAbsolutePath().toString().concat("\\");
-//        String outPath = s.concat(inputFileName.split("\\.")[0]).concat(".JSONL");
         return sb.toString();
     }
 }
