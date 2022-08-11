@@ -20,5 +20,8 @@ A simple file parser using Java.
 - System expects **file name and separator** from the arguments as required. 
 - **jUnit** is used for test case.
 
+## TODO
+- Stream API Incorporation
 ## Improvemnt Options:
 - Dyncamically, define separator from data.
+
