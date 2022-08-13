@@ -18,10 +18,44 @@ A simple file parser using Java.
 - First line of the file will be used as header.
 - If first line is empty, then system will not parse the file.
 - System expects **file name and separator** from the arguments as required. 
+- **StandardCharsets.UTF_8** is used.
 - **jUnit** is used for test case.
 
-## TODO
-- Stream API Incorporation
+## TODO [Done]
+- Stream API Incorporation (Incorporated)
+  - In main method: **doFileProcessUsingStream** is added
+  - In main method: **doFileProcess** is deprecated using **@Deprecated**.
+
+## Test Data Format :
+
+### Input : 
+
+- Sample #1
+
+![image](https://user-images.githubusercontent.com/75577090/184492655-2b62e202-3d34-4475-9292-f013c8747803.png)
+
+firstName|middleName|lastName|gender|dateOfBirth|salary
+Wolfgang|Amadeus|Mozart|Male|1756-01-27|1000
+Albert||Einstein|Male|1955/04/18|2000
+Marie, Salomea|"Skłodowska |"|Curie|Female|04-07-1934|3000
+
+- Sample #2
+
+![image](https://user-images.githubusercontent.com/75577090/184492720-6746f6d2-f4f7-40e0-9510-a81b1c69577d.png)
+
+firstName,middleName,lastName,gender,dateOfBirth,salary
+Wolfgang,AmadeusMozart,Male1756-01-27,1000
+Albert,,Einstein,Male1955/04/18,2000
+"Marie, Salomea",Skłodowska |,Curie,Female,04-07-1934,3000
+
+
+### Output :
+
+{"firstName":"Wolfgang","middleName":"Amadeus","lastName":"Mozart","gender":"Male","dateOfBirth":"1756-01-27","salary":"1000"}
+{"firstName":"Albert","lastName":"Einstein","gender":"Male","dateOfBirth":"1955-04-18","salary":"2000"}
+{"firstName":"Marie, Salomea","middleName":"Skłodowska |","lastName":"Curie","gender":"Female","dateOfBirth":"1934-07-04","salary":"3000"}
+
+
 ## Improvemnt Options:
 - Dyncamically, define separator from data.
 
