@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.PrintWriter;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -15,12 +16,14 @@ import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 public class FileParser {
-    final String inputFilePath;
-    final char separator;
+    private final String inputFilePath;
+    private final char separator;
+    private final Charset charset;
 
     public FileParser(String inputFilePath, char separator) {
         this.inputFilePath = inputFilePath;
         this.separator = separator;
+        this.charset = StandardCharsets.UTF_8;
     }
 
     public AbstractMap.SimpleEntry<Boolean, String> parseFile() {
@@ -122,7 +125,7 @@ public class FileParser {
 
         //endregion
 
-        try (Stream<String> linesUnfiltered = Files.lines(Path.of(inputFilePath), StandardCharsets.UTF_8)) {
+        try (Stream<String> linesUnfiltered = Files.lines(Path.of(inputFilePath), charset)) {
 
             Iterator<String> it = linesUnfiltered.iterator();
 
@@ -149,12 +152,11 @@ public class FileParser {
 
             //region Instantiating FileWriter, PrintWriter & ObjectMapper
 
-            FileWriter fileWriter = new FileWriter(fileUtil.getOutFilePath());
+            FileWriter fileWriter = new FileWriter(fileUtil.getOutFilePath(), charset);
             PrintWriter printWriter = new PrintWriter(fileWriter);
             ObjectMapper mapper = new ObjectMapper();
 
             //endregion
-
 
             for (int index = 0; index < collectedOtherLines.size(); index++) {
 
@@ -181,12 +183,15 @@ public class FileParser {
                     AbstractMap.SimpleEntry<Boolean, String> entry = DateUtil.DateValidation(String.valueOf(splitStringList.get(i)));
 
                     obj.put(headerFields.get(i), entry.getKey() ? entry.getValue() : value);
+
                 }
 
                 //endregion
 
                 //region writing transformed line item in out file
+
                 printWriter.println(mapper.writeValueAsString(obj));
+
                 //endregion
 
             }
