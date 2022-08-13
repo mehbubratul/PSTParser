@@ -4,6 +4,7 @@ A simple file parser using Java.
 
 ## How to run:
 -  Call from console where the jar is located.
+  - Here inside target folder the jar **pstparser-jar-with-dependencies.jar** is resided.
 -  pattern : java -jar jarname -f filename -s separator
 -  example : **java -jar pstparser-jar-with-dependencies.jar -f "E:\\Java\\fileToParse.txt" -s "|"**
 
@@ -21,7 +22,7 @@ A simple file parser using Java.
 - **StandardCharsets.UTF_8** is used.
 - **jUnit** is used for test case.
 
-## TODO [Done]
+## TODO : [Done]
 - Stream API Incorporation (Incorporated)
   - In main method: **doFileProcessUsingStream** is added
   - In main method: **doFileProcess** is deprecated using **@Deprecated**.
@@ -58,4 +59,6 @@ Albert,,Einstein,Male1955/04/18,2000
 
 ## Improvement Options:
 - Dynamically, define separator from data.
+- Currently, few date patterns is used (see below). This can be improved as required.
+  - Date Patterns : "yyyy-MM-dd", "yyyy/MM/dd", "dd-MM-yyyy", "dd/MM/yyyy", "dd-MMM-yyyy", "MM-dd-yyyy", "MM/dd/yyyy", "yyyyMMdd"
 
