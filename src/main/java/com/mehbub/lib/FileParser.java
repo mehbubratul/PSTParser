@@ -26,6 +26,7 @@ public class FileParser {
         this.charset = StandardCharsets.UTF_8;
     }
 
+    @Deprecated
     public AbstractMap.SimpleEntry<Boolean, String> parseFile() {
 
         //region File Validation
