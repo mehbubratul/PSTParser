@@ -56,6 +56,6 @@ Albert,,Einstein,Male1955/04/18,2000
 {"firstName":"Marie, Salomea","middleName":"Skłodowska |","lastName":"Curie","gender":"Female","dateOfBirth":"1934-07-04","salary":"3000"}
 
 
-## Improvemnt Options:
-- Dyncamically, define separator from data.
+## Improvement Options:
+- Dynamically, define separator from data.
 
