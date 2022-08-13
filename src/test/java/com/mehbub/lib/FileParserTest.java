@@ -1,9 +1,13 @@
 package com.mehbub.lib;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.AbstractMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -103,6 +107,17 @@ class FileParserTest {
         System.out.println(result.getValue());
         //then
         assertTrue(result.getKey());
+    }
+
+    @Test
+    void StringWithDoubleQuotation() throws JsonProcessingException {
+        ObjectMapper mapper = new ObjectMapper();
+        Map<String, Object> obj = new LinkedHashMap<>();
+        String key = "middleName";
+        Object value = "Skłodowska |";
+        obj.put(key, value);
+        String s = mapper.writeValueAsString(obj);
+        System.out.println(s);
     }
 
 }

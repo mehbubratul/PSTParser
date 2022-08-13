@@ -16,7 +16,30 @@ public class Main {
         System.out.println("... DSV Parser ...");
         System.out.println(" You provided " + args.length + " arguments.\n");
 
-        doFileProcess(args);
+        //doFileProcess(args);
+        doFileProcessUsingStream(args);
+    }
+
+    private static void doFileProcessUsingStream(String[] args) {
+        if (args == null) {
+            System.out.println("Validation: Missing required arg!");
+            return;
+        }
+
+        CommandLineParserUtil commandLineParserUtil = new CommandLineParserUtil();
+
+        boolean isAbleToParse = commandLineParserUtil.run(args);
+
+        if (!isAbleToParse) {
+            System.out.println("Unable to parse...");
+            return;
+        }
+
+        String inputFilePath = commandLineParserUtil.getFileName();
+        char separator = commandLineParserUtil.getSeparator();
+
+        FileParser fileParser = new FileParser(inputFilePath, separator);
+        fileParser.parseFileUsingStream();
     }
 
     private static void doFileProcess(String[] args) {
