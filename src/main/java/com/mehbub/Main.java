@@ -20,6 +20,7 @@ public class Main {
         doFileProcessUsingStream(args);
     }
 
+    //region private methods
     private static void doFileProcessUsingStream(String[] args) {
         if (args == null) {
             System.out.println("Validation: Missing required arg!");
@@ -42,6 +43,7 @@ public class Main {
         fileParser.parseFileUsingStream();
     }
 
+    @Deprecated
     private static void doFileProcess(String[] args) {
         if (args == null) {
             System.out.println("Validation: Missing required arg!");
@@ -63,4 +65,5 @@ public class Main {
         FileParser fileParser = new FileParser(inputFilePath, separator);
         fileParser.parseFile();
     }
+    //endregion
 }

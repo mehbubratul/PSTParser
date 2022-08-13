@@ -129,46 +129,44 @@ public class FileParser {
             //region headers
 
             String firstLine = it.next();
-            List<String> headers = Stream.of(firstLine).collect(Collectors.toList());
-            List<String> headerFields = getWordList(headers);
+
+            List<String> headerFields = getHeaderList(firstLine);
+
             if (headerFields == null) {
                 return new AbstractMap.SimpleEntry<>(false, "Headers must be present in text file.");
             }
             if (headerFields.size() == 0) {
                 return new AbstractMap.SimpleEntry<>(false, "Headers must be present in text file.");
             }
-            //System.out.println(headerFields);
 
             //endregion
 
             //region Rest Lines
 
-            List<String> collectedOtherLines = StreamSupport
-                    .stream(Spliterators.spliteratorUnknownSize(it, 0), false)
-                    .map(String::toString)
-                    .collect(Collectors.toList());
-            /*
-            Stream<String> otherLines = StreamSupport
-                    .stream(Spliterators.spliteratorUnknownSize(it, 0), false);
-            List<String> collect = otherLines
-                    .map(String::toString)
-                    .collect(Collectors.toList());
-            // String outFilePath = fileUtil.getOutFilePath();
-            */
+            List<String> collectedOtherLines = getRestLines(it);
+
+            //endregion
+
+            //region Instantiating FileWriter, PrintWriter & ObjectMapper
 
             FileWriter fileWriter = new FileWriter(fileUtil.getOutFilePath());
             PrintWriter printWriter = new PrintWriter(fileWriter);
             ObjectMapper mapper = new ObjectMapper();
 
+            //endregion
+
+
             for (int index = 0; index < collectedOtherLines.size(); index++) {
 
-                List<String> splitStringList = getSplittedStringList(collectedOtherLines.get(index));
+                //region Get tokens/Words into list from each line item
+                List<String> splitStringList = getSplitStringList(collectedOtherLines.get(index));
 
                 if (headerFields.size() > splitStringList.size()) {
-
                     return new AbstractMap.SimpleEntry<>(false, "Mismatch in header count with value provided in line # " + (index + 1));
-
                 }
+                //endregion
+
+                //region Creating Map using header as key and split string as value
 
                 Map<String, Object> obj = new LinkedHashMap<>();
 
@@ -185,18 +183,24 @@ public class FileParser {
                     obj.put(headerFields.get(i), entry.getKey() ? entry.getValue() : value);
                 }
 
+                //endregion
+
+                //region writing transformed line item in out file
                 printWriter.println(mapper.writeValueAsString(obj));
+                //endregion
 
             }
-            //endregion
 
             //region Closing FileWriter & PrintWriter
+
             printWriter.close();
             fileWriter.close();
+
             //endregion
 
-            System.out.println("... File parsed successfully. ...");
-            System.out.println("Please, check the jar location to get the produced file.");
+            System.out.println(" File parsed successfully.");
+            System.out.println(" Please, check the jar / input file location to get the JSONL file.");
+
             return new AbstractMap.SimpleEntry<>(true, "File parsed successfully.");
 
         } catch (Exception ex) {
@@ -205,20 +209,29 @@ public class FileParser {
 
     }
 
-    private List<String> getWordList(List<String>... lists) {
-        List<String> collect = Stream.of(lists)
+    private List<String> getRestLines(Iterator<String> it) {
+        return StreamSupport
+                .stream(Spliterators.spliteratorUnknownSize(it, 0), false)
+                .map(String::toString)
+                .collect(Collectors.toList());
+    }
+
+    private List<String> getHeaderList(String firstLine) {
+        List<String> lists = Stream.of(firstLine).collect(Collectors.toList());
+        return Stream.of(lists)
                 .flatMap(Collection::stream)
                 .flatMap(Pattern.compile(Pattern.quote(String.valueOf(separator)))::splitAsStream)
                 .collect(Collectors.toList());
-        return collect;
     }
 
-    private List<String> getSplittedStringList(String line) {
-        List<String> result = new ArrayList<String>();
+    private List<String> getSplitStringList(String line) {
+
+        List<String> result = new ArrayList<>();
 
         int start = 0;
         boolean inQuotes = false;
         boolean isQuotePresent = false;
+
         for (int current = 0; current < line.length(); current++) {
             if (line.charAt(current) == '"') {
                 inQuotes = !inQuotes; // toggle state
@@ -235,6 +248,7 @@ public class FileParser {
                 }
             }
         }
+
         result.add(line.substring(start));
 
         return result;

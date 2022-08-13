@@ -35,7 +35,7 @@ public class FileUtil {
 
     public String getOutFilePath() {
         String inputFileName = Paths.get(inputFilePath).getFileName().toString();
-        String outFileName = "JSON_OUT";// inputFileName.split("\\.")[0];
+        String outFileName = inputFileName.split("\\.")[0];
 
         StringBuilder sb = new StringBuilder(Paths.get("").toAbsolutePath().toString());
         sb.append("\\");

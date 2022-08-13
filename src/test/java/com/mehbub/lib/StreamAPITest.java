@@ -15,8 +15,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 /**
  * https://reflectoring.io/processing-files-using-java-8-streams/
  * Streams are lazy-loaded
@@ -117,58 +115,6 @@ public class StreamAPITest {
     }
     //endregion
 
-    @Test
-    void SplitFileLinesUsingNioFilesLinesAndTryWithResources() {
-
-        try (Stream<String> lines = Files
-                .lines(Path.of(dsvInputTwoFilePath), StandardCharsets.UTF_8)) {
-
-            /* using iterator
-            Iterator<String> iterator = lines.iterator();
-            if (iterator.hasNext()) {
-                List<String> headers = handleFirst(iterator.next());
-                while (iterator.hasNext()) {
-                    List<String> rowCells = handleLine(iterator.next());
-                }
-            }
-             */
-
-            // header row
-            // find first
-            /*
-            List<String> headers = lines.findFirst().map(line -> {
-                String[] arr = line.split(Pattern.quote("|"));
-                List<String> tokens = new ArrayList<>();
-                for (String s : arr) {
-                    tokens.add(s);
-                }
-                return tokens;
-            }).orElse(null);
-            System.out.println(headers);
-            */
-
-
-            lines.limit(1).map(line -> {
-                String[] arr = line.split(Pattern.quote("|"));
-                List<String> tokens = new ArrayList<>();
-                for (String s : arr) {
-                    tokens.add(s);
-                }
-                return tokens;
-            }).forEach(System.out::println);
-
-            // Data row
-            lines.forEach(System.out::println);
-//            Stream<String> words = lines
-//                    .flatMap(line -> Stream.of(line.split("\\W+")));
-//            Set<String> wordSet = words.collect(Collectors.toSet());
-//            System.out.println(wordSet);
-
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
     // https://stackoverflow.com/questions/60111797/java-8-streams-filter-lines-from-csv-but-retain-first-line
     @Test
     void test2() {
@@ -241,33 +187,6 @@ public class StreamAPITest {
         return collect;
     }
 
-    private List<String> handleLine(String headers) {
-        return null;
-    }
-
-    private List<String> handleFirst(String cells) {
-        return null;
-    }
-
-    private String getParsedWordsFromLine(String[] arr) {
-        List<?> cells;
-        for (int index = 0; index < arr.length; index++) {
-            System.out.println(arr[index]);
-        }
-        return "abc";
-    }
-
-    @Test
-    public void givenRegexWithPipeEscaped_whenSplitStr_thenSplits() {
-        // String strInput = "foo|bar|hello|world";
-        String strInput = "Marie, Salomea|\"Skłodowska |\"|Curie|Female|04-07-1934|3000";
-        String strRegex = "|";
-        String[] split = strInput.split(Pattern.quote(strRegex));
-        for (int i = 0; i < split.length; i++) {
-            System.out.println(split[i]);
-        }
-        assertTrue(6 == strInput.split(Pattern.quote(strRegex)).length);
-    }
 
     @Test
     void givenRegexWithSeparatorEscaped_whenSplitStr_thenSplits() {

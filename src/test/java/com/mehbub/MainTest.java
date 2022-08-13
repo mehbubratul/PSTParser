@@ -53,7 +53,16 @@ class MainTest {
         return args;
     }
 
-    private String[] getValidArgs() {
+    private String[] getValidArgsSampleFileOne() {
+        String[] args = new String[numberOfArguments];
+        args[0] = "-f";
+        args[1] = dsvInputOneFilePath;
+        args[2] = "-s";
+        args[3] = ",";
+        return args;
+    }
+
+    private String[] getValidArgsSampleFileTwo() {
         String[] args = new String[numberOfArguments];
         args[0] = "-f";
         args[1] = dsvInputTwoFilePath;
@@ -63,8 +72,13 @@ class MainTest {
     }
 
     @Test
-    void mainWithValidArgs() {
-        app.main(getValidArgs());
+    void mainWithValidArgsWithSampleFileTwo() {
+        app.main(getValidArgsSampleFileTwo());
+    }
+
+    @Test
+    void mainWithValidArgsWithSampleFileOne() {
+        app.main(getValidArgsSampleFileOne());
     }
 
     @Test
