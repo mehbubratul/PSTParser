@@ -2,6 +2,13 @@
 
 A simple file parser using Java.
 
+- **Open JDK 17**
+- **Fasterxml jackson-databind** : For Object Mapper to writeValueAsString(obj).
+- **Apache commons-validator** : For Date Validator. Method used is GenericValidator.isDate()
+- **Apache commons-cli** : For CommandLineParser from cli.
+- **Apache maven**: For build Tool
+- **IntelliJ IDEA** 2022.1.1 (**Community Edition**) : For IDE
+
 ## How to run:
 -  Call from console where the jar is located.
   - Here inside target folder the jar **pstparser-jar-with-dependencies.jar** is resided.
