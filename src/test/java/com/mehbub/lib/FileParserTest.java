@@ -13,12 +13,15 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class FileParserTest {
 
+    //region private fields
     String dsvInputOneFilePath;
     String dsvInputTwoFilePath;
     String invalidFileType;
     String validFileButFirstLineEmpty;
     String mismatchLineCellsWithHeaderRowCells;
     String lastCellOfOneRecordHasNoData;
+    String dsv_100000_Rows;
+    //endregion
 
     @BeforeEach
     void setUp() {
@@ -28,8 +31,10 @@ class FileParserTest {
         validFileButFirstLineEmpty = "src/test/resources/testData/DSV input 2 - No header.txt";
         mismatchLineCellsWithHeaderRowCells = "src/test/resources/testData/DSV input 2-header-Rows-Mismatch.txt";
         lastCellOfOneRecordHasNoData = "src/test/resources/testData/DSV input 2-LastCellOfARowIsEmptySpace.txt";
+        dsv_100000_Rows = "src/test/resources/testData/DSV_100000_Rows.txt";
     }
 
+    //region Test methods
     @Test
     void givenValidFilePathAndValidSeparatorWillReturnTrue_1() {
         // given valid file path & valid separator
@@ -37,7 +42,8 @@ class FileParserTest {
         char separator = ',';
 
         //when
-        AbstractMap.SimpleEntry<Boolean, String> result = new FileParser(inputFilePath, separator).parseFile();
+        // AbstractMap.SimpleEntry<Boolean, String> result = new FileParser(inputFilePath, separator).parseFile();
+        AbstractMap.SimpleEntry<Boolean, String> result = new FileParser(inputFilePath, separator).parseFileUsingStreamSupport();
 
         //then
         assertTrue(result.getKey());
@@ -50,7 +56,8 @@ class FileParserTest {
         char separator = '|';
 
         //when
-        AbstractMap.SimpleEntry<Boolean, String> result = new FileParser(inputFilePath, separator).parseFile();
+        // AbstractMap.SimpleEntry<Boolean, String> result = new FileParser(inputFilePath, separator).parseFile();
+        AbstractMap.SimpleEntry<Boolean, String> result = new FileParser(inputFilePath, separator).parseFileUsingStreamSupport();
 
         //then
         assertTrue(result.getKey());
@@ -63,10 +70,11 @@ class FileParserTest {
         String inputFilePath = invalidFileType;
         char separator = '|';
 
-        //when
-        AbstractMap.SimpleEntry<Boolean, String> result = new FileParser(inputFilePath, separator).parseFile();
+        // when
+        // AbstractMap.SimpleEntry<Boolean, String> result = new FileParser(inputFilePath, separator).parseFile();
+        AbstractMap.SimpleEntry<Boolean, String> result = new FileParser(inputFilePath, separator).parseFileUsingStreamSupport();
 
-        //then
+        // then
         assertFalse(result.getKey());
     }
 
@@ -76,8 +84,9 @@ class FileParserTest {
         String inputFilePath = validFileButFirstLineEmpty;
         char separator = '|';
 
-        //when
-        AbstractMap.SimpleEntry<Boolean, String> result = new FileParser(inputFilePath, separator).parseFile();
+        //  when
+        // AbstractMap.SimpleEntry<Boolean, String> result = new FileParser(inputFilePath, separator).parseFile();
+        AbstractMap.SimpleEntry<Boolean, String> result = new FileParser(inputFilePath, separator).parseFileUsingStreamSupport();
 
         //then
         assertFalse(result.getKey());
@@ -90,10 +99,10 @@ class FileParserTest {
         String inputFilePath = mismatchLineCellsWithHeaderRowCells;
         char separator = '|';
 
-        //when
+        // when
         AbstractMap.SimpleEntry<Boolean, String> result = new FileParser(inputFilePath, separator).parseFile();
-        System.out.println(result.getValue());
-        //then
+
+        // then
         assertFalse(result.getKey());
     }
 
@@ -102,9 +111,10 @@ class FileParserTest {
         // given valid file path & valid separator
         String inputFilePath = lastCellOfOneRecordHasNoData;
         char separator = '|';
-        //when
-        AbstractMap.SimpleEntry<Boolean, String> result = new FileParser(inputFilePath, separator).parseFile();
-        System.out.println(result.getValue());
+        // when
+        // AbstractMap.SimpleEntry<Boolean, String> result = new FileParser(inputFilePath, separator).parseFile();
+        AbstractMap.SimpleEntry<Boolean, String> result = new FileParser(inputFilePath, separator).parseFileUsingStreamSupport();
+
         //then
         assertTrue(result.getKey());
     }
@@ -119,5 +129,20 @@ class FileParserTest {
         String s = mapper.writeValueAsString(obj);
         System.out.println(s);
     }
+
+    @Test
+    void givenValidFilePathAndValidSeparatorAndLargeDataWillReturnTrue_1() {
+        // given valid file path & valid separator
+
+        char separator = ',';
+
+        //when
+        // AbstractMap.SimpleEntry<Boolean, String> result = new FileParser(inputFilePath, separator).parseFile();
+        AbstractMap.SimpleEntry<Boolean, String> result = new FileParser(dsv_100000_Rows, separator).parseFileUsingStreamSupport();
+
+        //then
+        assertTrue(result.getKey());
+    }
+    //endregion
 
 }

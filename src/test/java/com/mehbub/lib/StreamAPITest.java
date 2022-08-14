@@ -1,19 +1,21 @@
 package com.mehbub.lib;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.io.BufferedReader;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
 
 /**
  * https://reflectoring.io/processing-files-using-java-8-streams/
@@ -32,6 +34,17 @@ public class StreamAPITest {
     void setUp() {
         dsvInputTwoFilePath = "src/test/resources/testData/DSV input 2.txt";
         //dsvInputTwoFile = new File("src/test/resources/testData/DSV input 2.txt");
+    }
+
+    private List<String> getHeaderList() {
+        List<String> innerList = new ArrayList<>();
+        innerList.add("firstName");
+        innerList.add("middleName");
+        innerList.add("lastName");
+        innerList.add("gender");
+        innerList.add("dateOfBirth");
+        innerList.add("salary");
+        return innerList;
     }
 
     //region Load Files using File.lines() , Files.newBufferedReader() , Files.readAllLines()
@@ -115,79 +128,6 @@ public class StreamAPITest {
     }
     //endregion
 
-    // https://stackoverflow.com/questions/60111797/java-8-streams-filter-lines-from-csv-but-retain-first-line
-    @Test
-    void test2() {
-        try (Stream<String> linesUnfiltered = Files.lines(Path.of(dsvInputTwoFilePath), StandardCharsets.UTF_8)) {
-            Iterator<String> it = linesUnfiltered.iterator();
-
-            // headers
-            String firstLine = it.next();
-            List<String> headers = Stream.of(firstLine).collect(Collectors.toList());
-            List<String> wordList = getWordList(headers);
-            //System.out.println(wordList);
-
-            // other lines
-            Stream<String> otherLines = StreamSupport
-                    .stream(Spliterators.spliteratorUnknownSize(it, 0), false);
-            List<String> collect = otherLines
-                    .map(String::toString)
-                    .collect(Collectors.toList());
-            Character separator = '|';
-            //collect.stream().forEach(line -> getSplittedStringList(line, separator));
-
-            for (int index = 0; index < collect.size(); index++) {
-                List<String> splittedStringList = getSplittedStringList(collect.get(index), separator);
-                System.out.println(splittedStringList);
-            }
-//            List<String> otherLineList = getWordList(collect);
-//            for (int i = 0; i < otherLineList.size(); i++) {
-//                System.out.println(otherLineList.get(i));
-//            }
-            //System.out.println(otherLineList);
-
-//            Stream<String> linesFiltered = null;//otherLines.map(s -> s.split(Pattern.quote("|"))).;
-//            Stream<String> result = Stream.concat(Stream.of(firstLine), otherLines);
-//            Files.write(Path.of(dsvInputTwoFilePath), (Iterable<String>) result::iterator);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-
-    private List<String> getSplittedStringList(String line, Character separator) {
-        List<String> result = new ArrayList<String>();
-
-        int start = 0;
-        boolean inQuotes = false;
-        for (int current = 0; current < line.length(); current++) {
-            if (line.charAt(current) == '\"') inQuotes = !inQuotes; // toggle state
-            else {
-                if (line.charAt(current) == separator && !inQuotes) {
-                    result.add(line.substring(start, current));
-                    start = current + 1;
-                }
-            }
-        }
-        result.add(line.substring(start));
-
-        for (int i = 0; i < result.size(); i++) {
-            System.out.println(result.get(i));
-        }
-        return result;
-    }
-
-    private List<String> getWordList(List<String>... lists) {
-
-        List<String> collect = Stream.of(lists) // Stream<Stream<String>>
-                .flatMap(Collection::stream) // Stream<String>
-                //.flatMap(Pattern.compile("\\P{L}")::splitAsStream) //Stream<String>
-                .flatMap(Pattern.compile(Pattern.quote("|"))::splitAsStream) //Stream<String>
-                .collect(Collectors.toList());// List<String>
-        return collect;
-    }
-
-
     @Test
     void givenRegexWithSeparatorEscaped_whenSplitStr_thenSplits() {
         //String line = "foo,bar,c;qual=\"baz,blurb\",d;junk=\"quux,syzygy\"";
@@ -203,31 +143,7 @@ public class StreamAPITest {
     }
 
     @Test
-    void anotherTest() {
-        //String line = "foo,bar,c;qual=\"baz,blurb\",d;junk=\"quux,syzygy\"";
-        String line2 = "Marie, Salomea|\"Skłodowska |\"|Curie|Female|04-07-1934|3000";
-        String otherThanQuote = " [^\"] ";
-        String quotedString = String.format(" \" %s* \" ", otherThanQuote);
-        String regex = String.format("(?x) " + // enable comments, ignore white spaces
-                        "|                         " + // match a comma
-                        "(?=                       " + // start positive look ahead
-                        "  (?:                     " + //   start non-capturing group 1
-                        "    %s*                   " + //     match 'otherThanQuote' zero or more times
-                        "    %s                    " + //     match 'quotedString'
-                        "  )*                      " + //   end group 1 and repeat it zero or more times
-                        "  %s*                     " + //   match 'otherThanQuote'
-                        "  $                       " + // match the end of the string
-                        ")                         ", // stop positive look ahead
-                otherThanQuote, quotedString, otherThanQuote);
-
-        String[] tokens = line2.split(regex, -1);
-        for (String t : tokens) {
-            System.out.println("> " + t);
-        }
-    }
-
-    @Test
-    void anotherTest2() {
+    void testLineItemParsing() {
         //String input = "foo,bar,c;qual=\"baz,blurb\",d;junk=\"quux,syzygy\"";
         // String line = "Wolfgang|Amadeus|Mozart|Male|1756-01-27|1000";
         // String line = "Albert||Einstein|Male|1955/04/18|2000";
@@ -265,5 +181,78 @@ public class StreamAPITest {
         for (int i = 0; i < result.size(); i++) {
             System.out.println(result.get(i));
         }
+    }
+
+    @Test
+    void testListParsing() throws IOException {
+
+        List<String> lines = new ArrayList<>();
+
+        lines.add("Wolfgang|Amadeus|Mozart|Male|1756-01-27|1000");
+        lines.add("Albert||Einstein|Male|1955/04/18|2000");
+        lines.add("Marie, Salomea|\"Skłodowska |\"|Curie|Female|04-07-1934|3000");
+
+        List<String> headerFields = getHeaderList();
+
+        ObjectMapper mapper = new ObjectMapper();
+        FileUtil fileUtil = new FileUtil(dsvInputTwoFilePath);
+        FileWriter fileWriter = new FileWriter(fileUtil.getOutFilePath(), StandardCharsets.UTF_8);
+        PrintWriter printWriter = new PrintWriter(fileWriter);
+        Character separator = '|';
+
+        lines.stream()
+                .map(String::toString)
+                .map(s -> getSplitStringList(s, separator)).toList()
+                .forEach(lineItems -> {
+                    Map<String, Object> obj = new LinkedHashMap<>();
+
+                    for (int index = 0; index < headerFields.size(); index++) {
+                        Object value = lineItems.get(index);
+                        if (value == null || value == "") {
+                            continue;
+                        }
+                        String key = headerFields.get(index);
+                        AbstractMap.SimpleEntry<Boolean, String> entry = DateUtil.DateValidation(String.valueOf(value));
+                        obj.put(key, entry.getKey() ? entry.getValue() : value);
+                    }
+
+                    try {
+                        printWriter.println(mapper.writeValueAsString(obj));
+                    } catch (JsonProcessingException e) {
+                        throw new RuntimeException(e);
+                    }
+                });
+        printWriter.close();
+        fileWriter.close();
+    }
+
+    private List<String> getSplitStringList(String line, char separator) {
+
+        List<String> result = new ArrayList<>();
+
+        int start = 0;
+        boolean inQuotes = false;
+        boolean isQuotePresent = false;
+
+        for (int current = 0; current < line.length(); current++) {
+            if (line.charAt(current) == '"') {
+                inQuotes = !inQuotes; // toggle state
+                isQuotePresent = true;
+            } else {
+                if (line.charAt(current) == separator && !inQuotes) {
+                    if (isQuotePresent) {
+                        result.add(line.substring(start + 1, current - 1));
+                        isQuotePresent = false;
+                    } else {
+                        result.add(line.substring(start, current));
+                    }
+                    start = current + 1;
+                }
+            }
+        }
+
+        result.add(line.substring(start));
+
+        return result;
     }
 }

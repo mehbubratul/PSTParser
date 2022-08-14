@@ -1,5 +1,6 @@
 package com.mehbub.lib;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.FileInputStream;
@@ -16,6 +17,8 @@ import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 public class FileParser {
+
+    //region private fields & constructor
     private final String inputFilePath;
     private final char separator;
     private final Charset charset;
@@ -25,6 +28,9 @@ public class FileParser {
         this.separator = separator;
         this.charset = StandardCharsets.UTF_8;
     }
+    //endregion
+
+    //region public methods
 
     @Deprecated
     public AbstractMap.SimpleEntry<Boolean, String> parseFile() {
@@ -112,6 +118,7 @@ public class FileParser {
         //endregion
     }
 
+    @Deprecated
     public AbstractMap.SimpleEntry<Boolean, String> parseFileUsingStream() {
 
         //region File Validation
@@ -148,6 +155,10 @@ public class FileParser {
             //region Rest Lines
 
             List<String> collectedOtherLines = getRestLines(it);
+
+            if (collectedOtherLines.size() == 0) {
+                return new AbstractMap.SimpleEntry<>(false, "Only headers are present in text file.");
+            }
 
             //endregion
 
@@ -204,16 +215,104 @@ public class FileParser {
 
             //endregion
 
-            System.out.println(" File parsed successfully.");
-            System.out.println(" Please, check the jar / input file location to get the JSONL file.");
-
-            return new AbstractMap.SimpleEntry<>(true, "File parsed successfully.");
+            return new AbstractMap.SimpleEntry<>(true, "File parsed successfully. Please, check the jar / input file location to get the JSONL file.");
 
         } catch (Exception ex) {
-            return new AbstractMap.SimpleEntry<>(false, ex.getMessage());
+            return new AbstractMap.SimpleEntry<>(false, "Error: Unable to parse file..." + ex.getMessage());
         }
 
     }
+
+    public AbstractMap.SimpleEntry<Boolean, String> parseFileUsingStreamSupport() {
+
+        //region File Validation
+
+        FileUtil fileUtil = new FileUtil(inputFilePath);
+
+        AbstractMap.SimpleEntry<Boolean, String> result = fileUtil.fileValidation();
+
+        if (!result.getKey()) {
+            return new AbstractMap.SimpleEntry<>(false, result.getValue());
+        }
+
+        //endregion
+
+        try (Stream<String> linesUnfiltered = Files.lines(Path.of(inputFilePath), charset)) {
+
+            Iterator<String> it = linesUnfiltered.iterator();
+
+            //region Headers
+
+            String firstLine = it.next();
+
+            boolean nullOrEmptyOrBlank = new StringUtil().isNullOrEmptyOrBlank(firstLine);
+
+            if (nullOrEmptyOrBlank) {
+                return new AbstractMap.SimpleEntry<>(false, "Headers must be present in text file.");
+            }
+
+            List<String> headerFields = getHeaderList(firstLine);
+
+            if (headerFields == null) {
+                return new AbstractMap.SimpleEntry<>(false, "Headers must be present in text file.");
+            }
+            if (headerFields.size() == 0) {
+                return new AbstractMap.SimpleEntry<>(false, "Headers must be present in text file.");
+            }
+
+            //endregion
+
+            //region Rest Lines
+
+            ObjectMapper mapper = new ObjectMapper();
+            FileWriter fileWriter = new FileWriter(fileUtil.getOutFilePath(), charset);
+            PrintWriter printWriter = new PrintWriter(fileWriter);
+
+            StreamSupport
+                    .stream(Spliterators.spliteratorUnknownSize(it, 0), false)
+                    .map(String::toString)
+                    .map(line -> getSplitStringList(line)).toList()
+                    .forEach(lineItems -> {
+                        if (lineItems == null) {
+                            return;
+                        }
+                        Map<String, Object> obj = new LinkedHashMap<>();
+
+                        for (int index = 0; index < headerFields.size(); index++) {
+                            Object value = lineItems.get(index);
+                            if (value == null || value == "") {
+                                continue;
+                            }
+                            String key = headerFields.get(index);
+                            AbstractMap.SimpleEntry<Boolean, String> entry = DateUtil.DateValidation(String.valueOf(value));
+                            obj.put(key, entry.getKey() ? entry.getValue() : value);
+                        }
+
+                        try {
+                            printWriter.println(mapper.writeValueAsString(obj));
+                        } catch (JsonProcessingException e) {
+                            throw new RuntimeException(e);
+                        }
+                    })
+            ;
+
+            printWriter.close();
+            fileWriter.close();
+
+
+            //endregion
+
+            return new AbstractMap.SimpleEntry<>(true, "File parsed successfully. Please, check the jar / input file location to get the JSONL file.");
+
+        } catch (Exception ex) {
+            return new AbstractMap.SimpleEntry<>(false, "Error: Unable to parse file..." + ex.getMessage());
+        }
+
+    }
+
+    //endregion
+
+    //region private methods
 
     private List<String> getRestLines(Iterator<String> it) {
         return StreamSupport
@@ -222,12 +321,13 @@ public class FileParser {
                 .collect(Collectors.toList());
     }
 
-    private List<String> getHeaderList(String firstLine) {
-        List<String> lists = Stream.of(firstLine).collect(Collectors.toList());
-        return Stream.of(lists)
-                .flatMap(Collection::stream)
+    private List<String> getHeaderList(String line) {
+
+        List<String> headerFields = Stream.of(line)
                 .flatMap(Pattern.compile(Pattern.quote(String.valueOf(separator)))::splitAsStream)
                 .collect(Collectors.toList());
+
+        return headerFields;
     }
 
     private List<String> getSplitStringList(String line) {
@@ -259,4 +359,7 @@ public class FileParser {
 
         return result;
     }
+
+    //endregion
+
 }
